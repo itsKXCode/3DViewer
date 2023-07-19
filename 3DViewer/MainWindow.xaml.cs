@@ -26,14 +26,14 @@ namespace _3DViewer
 
         private void Import_Click(object sender, RoutedEventArgs e)
         {
+            //Open File Dialog
             var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.Filter = "stl, obj, ply (*.stl, *.obj, *.ply)| *.stl; *.obj; *.ply"; // Filter files by extension
+            dialog.Filter = "stl, obj, ply (*.stl, *.obj, *.ply)| *.stl; *.obj; *.ply"; 
 
             var result = dialog.ShowDialog();
 
             if (result == true)
                 _viewModel.ImportFile(dialog.FileName);
-
         }
     }
 }

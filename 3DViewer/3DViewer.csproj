@@ -63,7 +63,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interactors\BaseInteractor.cs" />
+    <Compile Include="Interactors\PointMeasureInteractor.cs" />
     <Compile Include="Utilities\ModelImporter.cs" />
+    <Compile Include="VTKHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

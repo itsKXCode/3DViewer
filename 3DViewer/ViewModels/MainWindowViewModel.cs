@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Xml;
+using _3DViewer.Interactors;
 using _3DViewer.Utilities;
 using Kitware.VTK;
 
@@ -16,8 +18,8 @@ namespace _3DViewer.ViewModels
     {
         private vtkRenderWindow _renderWindow;
         private vtkRenderer _mainRenderer { get => _renderWindow.GetRenderers().GetFirstRenderer(); }
-        private vtkRenderer _secondRenderer;
-        private vtkRenderer _thirdRenderer;
+        private vtkRenderer _secondRenderer = vtkRenderer.New();
+        private vtkRenderer _thirdRenderer = vtkRenderer.New();
 
         public MainWindowViewModel(vtkRenderWindow renderWindow)
         {
@@ -73,6 +75,7 @@ namespace _3DViewer.ViewModels
             SetupRenderer();
             SetupCamera();
             SetupLight();
+            SetupDefaultInteractor();
 
             _renderWindow.Render();
         }
@@ -89,19 +92,21 @@ namespace _3DViewer.ViewModels
             _thirdRenderer = vtkRenderer.New();
 
             _secondRenderer.SetLayer(1);
-            _thirdRenderer.SetLayer(1);
+            //_thirdRenderer.SetLayer(1);
             _mainRenderer.SetLayer(0);
+
             _renderWindow.AddRenderer(_secondRenderer);
         }
 
         private void SetupCamera()
         {
             var camera = vtkCamera.New();
-            camera.SetClippingRange(1, 1000);
+            camera.SetClippingRange(0.1, 100);
             camera.SetFocalPoint(0, 0, 0);
             camera.SetPosition(0, 0, 100);
-            //camera.SetViewUp(0, 1, 0);
+            camera.SetThickness(1000);
 
+            //camera.SetViewUp(0, 1, 0);
             _mainRenderer.SetActiveCamera(camera);
             _secondRenderer.SetActiveCamera(camera);
         }
@@ -119,17 +124,20 @@ namespace _3DViewer.ViewModels
             light.SetLightTypeToCameraLight();
 
             _mainRenderer.AddLight(light);
+            _secondRenderer.AddLight(light);
         }
 
         private void SetupDefaultInteractor()
         {
-            var trackball = vtkInteractorStyleTrackballCamera.New();
+            var trackball = new PointMeasureInteractor();
             trackball.SetMotionFactor(30);
             trackball.SetMouseWheelMotionFactor(0.5);
 
             var interactor = vtkRenderWindowInteractor.New();
             interactor.SetInteractorStyle(trackball);
             _renderWindow.SetInteractor(interactor);
+
+            trackball.SetDefaultRenderer(_mainRenderer);
         }
 
 
