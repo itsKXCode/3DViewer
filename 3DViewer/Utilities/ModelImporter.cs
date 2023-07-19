@@ -10,6 +10,12 @@ namespace _3DViewer.Utilities
 {
     public static class ModelImporter
     {
+        /// <summary>
+        /// Imports a Compatible File (.stl, .obj, .ply)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static vtkPolyData ImportFile(string filePath)
         {
             switch (Path.GetExtension(filePath).ToLower())
@@ -30,7 +36,7 @@ namespace _3DViewer.Utilities
                     plyReader.Update();
                     return plyReader.GetOutput();
                 default:
-                    throw new NotImplementedException($"Filetype {Path.GetExtension(filePath)} not Implemented");
+                    throw new NotImplementedException($"Filetype {Path.GetExtension(filePath)} not Supported");
             }
 
         }

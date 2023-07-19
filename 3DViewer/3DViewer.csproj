@@ -65,8 +65,9 @@
     </ApplicationDefinition>
     <Compile Include="Interactors\BaseInteractor.cs" />
     <Compile Include="Interactors\PointMeasureInteractor.cs" />
+    <Compile Include="Utilities\Interop.cs" />
     <Compile Include="Utilities\ModelImporter.cs" />
-    <Compile Include="VTKHelper.cs" />
+    <Compile Include="Utilities\VTKHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -107,6 +108,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\box.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

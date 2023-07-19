@@ -30,7 +30,17 @@ namespace _3DViewer.ViewModels
 
         public void ImportFile(string filePath)
         {
-            var polydata = ModelImporter.ImportFile(filePath);
+            vtkPolyData polydata = null;
+
+            try
+            {
+                polydata = ModelImporter.ImportFile(filePath);
+            }
+            catch (NotImplementedException e)
+            {
+                MessageBox.Show(e.Message);
+                return;
+            }
 
             //Convert Polydata to Triangles
             vtkTriangleFilter triangle = vtkTriangleFilter.New();
@@ -92,7 +102,7 @@ namespace _3DViewer.ViewModels
             _thirdRenderer = vtkRenderer.New();
 
             _secondRenderer.SetLayer(1);
-            //_thirdRenderer.SetLayer(1);
+            _thirdRenderer.SetLayer(1);
             _mainRenderer.SetLayer(0);
 
             _renderWindow.AddRenderer(_secondRenderer);
@@ -129,7 +139,7 @@ namespace _3DViewer.ViewModels
 
         private void SetupDefaultInteractor()
         {
-            var trackball = new PointMeasureInteractor();
+            var trackball = new BaseInteractor();
             trackball.SetMotionFactor(30);
             trackball.SetMouseWheelMotionFactor(0.5);
 
