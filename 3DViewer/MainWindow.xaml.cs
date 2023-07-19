@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using _3DViewer.ViewModels;
+using Kitware.VTK;
 
 namespace _3DViewer
 {
@@ -20,9 +10,30 @@ namespace _3DViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel _viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void MainRenderControl_Load(object sender, EventArgs e)
+        {
+            vtkObject.GlobalWarningDisplayOff();
+
+            _viewModel = new MainWindowViewModel(MainRenderControl.RenderWindow);
+        }
+
+        private void Import_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.Filter = "stl, obj, ply (*.stl, *.obj, *.ply)| *.stl; *.obj; *.ply"; // Filter files by extension
+
+            var result = dialog.ShowDialog();
+
+            if (result == true)
+                _viewModel.ImportFile(dialog.FileName);
+
         }
     }
 }
