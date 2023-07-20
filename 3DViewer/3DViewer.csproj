@@ -64,9 +64,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interactors\BaseInteractorStyle.cs" />
+    <Compile Include="Interactors\CrossSectionInteractorStyle.cs" />
     <Compile Include="Interactors\PointMeasureInteractorStyle.cs" />
     <Compile Include="Utilities\Interop.cs" />
     <Compile Include="Utilities\ModelImporter.cs" />
+    <Compile Include="Utilities\Vector3DExtension.cs" />
     <Compile Include="Utilities\VTKHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

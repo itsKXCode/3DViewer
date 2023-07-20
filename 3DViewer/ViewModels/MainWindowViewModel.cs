@@ -19,7 +19,8 @@ namespace _3DViewer.ViewModels
         public enum Modes
         {
             Default,
-            PointMeasure
+            PointMeasure,
+            CrossSection
         }
 
         private vtkRenderWindow _renderWindow;
@@ -50,6 +51,9 @@ namespace _3DViewer.ViewModels
                     break;
                 case Modes.PointMeasure:
                     _interactorStyle = new PointMeasureInteractorStyle();
+                    break;
+                case Modes.CrossSection:
+                    _interactorStyle = new CrossSectionInteractorStyle();
                     break;
                 default:
                     throw new NotImplementedException();

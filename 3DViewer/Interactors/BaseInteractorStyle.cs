@@ -18,6 +18,22 @@ namespace _3DViewer.Interactors
             this.SetMotionFactor(30);
             this.SetMouseWheelMotionFactor(0.5);
         }
+        protected vtkRenderer GetMainRenderer()
+        {
+            return base.GetInteractor().GetRenderWindow().GetRenderers().GetFirstRenderer();
+        }
+
+        protected vtkRenderer GetSecondRenderer()
+        {
+            base.GetInteractor().GetRenderWindow().GetRenderers().InitTraversal();
+            base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
+            return base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
+        }
+
+        protected vtkRenderWindow GetMainRenderWindow()
+        {
+            return base.GetInteractor().GetRenderWindow();
+        }
 
         public virtual void Clear() { }
 

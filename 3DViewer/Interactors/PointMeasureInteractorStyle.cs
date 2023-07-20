@@ -33,7 +33,7 @@ namespace _3DViewer.Interactors
         public override void Clear()
         {
             GetSecondRenderer().RemoveAllViewProps();
-            GetSecondRenderer().Render();
+            GetMainRenderWindow().Render();
             base.Clear();
         }
 
@@ -54,14 +54,14 @@ namespace _3DViewer.Interactors
             _picker.Pick(eventPosition[0], eventPosition[1], 0, mainRenderer);
 
             //3D Position
-            double[] worldPosition = _picker.GetPickPosition();
+            var worldPosition = Vector3DExtension.FromDouble3Array(_picker.GetPickPosition());
 
             if (_picker.GetCellId() > -1)
             {
                 //If Sphere1 is null, Measurement has not begun yet
                 if (_sphere1 == null)
                 {
-                    _sphere1 = VTKHelper.CreateSphere(new Vector3D(worldPosition[0], worldPosition[1], worldPosition[2]),0.04, _sphereColor);
+                    _sphere1 = VTKHelper.CreateSphere(worldPosition,0.04, _sphereColor);
 
                     secondRenderer.AddActor(_sphere1);
                     base.GetInteractor().GetRenderWindow().Render();
@@ -69,7 +69,7 @@ namespace _3DViewer.Interactors
                 else if(_sphere2 == null)
                 {
                     //First sphere has been set but Second sphere is null, now set the second
-                    _sphere2 = VTKHelper.CreateSphere(new Vector3D(worldPosition[0], worldPosition[1], worldPosition[2]), 0.04, _sphereColor);
+                    _sphere2 = VTKHelper.CreateSphere(worldPosition, 0.04, _sphereColor);
 
                     var center1 = new Vector3D(_sphere1.GetCenter()[0], _sphere1.GetCenter()[1], _sphere1.GetCenter()[2]);
                     var center2 = new Vector3D(_sphere2.GetCenter()[0], _sphere2.GetCenter()[1], _sphere2.GetCenter()[2]);
@@ -117,8 +117,8 @@ namespace _3DViewer.Interactors
                     //Check if the Pick is on an Actor, otherwise the Sphere would be in the Middle of the Air
                     if (_picker.GetActor() != null)
                     {
-                        double[] worldPosition = _picker.GetPickPosition();
-                        _sphereToMove.SetPosition(worldPosition[0], worldPosition[1], worldPosition[2]);
+                        var worldPosition = Vector3DExtension.FromDouble3Array(_picker.GetPickPosition());
+                        _sphereToMove.SetPosition(worldPosition.X, worldPosition.Y, worldPosition.Z);
 
                         var pos1 = new Vector3D(_sphere1.GetPosition()[0], _sphere1.GetPosition()[1], _sphere1.GetPosition()[2]);
                         var pos2 = new Vector3D(_sphere2.GetPosition()[0], _sphere2.GetPosition()[1], _sphere2.GetPosition()[2]);
@@ -172,16 +172,5 @@ namespace _3DViewer.Interactors
             _distanceTextWidget.On();
         }
 
-        private vtkRenderer GetMainRenderer()
-        {
-            return base.GetInteractor().GetRenderWindow().GetRenderers().GetFirstRenderer();
-        }
-
-        private vtkRenderer GetSecondRenderer()
-        {
-            base.GetInteractor().GetRenderWindow().GetRenderers().InitTraversal();
-            base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
-            return base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
-        }
     }
 }

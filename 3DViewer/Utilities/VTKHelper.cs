@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using Kitware.VTK;
@@ -61,6 +62,43 @@ namespace _3DViewer.Utilities
 
             return LineActor;
 
+        }
+
+        public static vtkActor CreateCut(Vector3D direction, Vector3D position, vtkActor actor)
+        {
+            vtkPlane plane = vtkPlane.New();
+            plane.SetOrigin(position.X, position.Y, position.Z);
+            plane.SetNormal(direction.X, direction.Y, direction.Z);
+
+            //Apply the Current Transform to the Polydata
+            vtkPolyData polyDataCopy = vtkPolyData.New();
+            vtkTransformPolyDataFilter transformation = vtkTransformPolyDataFilter.New();
+            polyDataCopy.DeepCopy(actor.GetMapper().GetInput());
+            transformation.SetInputData(polyDataCopy);
+            transformation.SetTransform(actor.GetUserTransform());
+            transformation.Update();
+
+            vtkCutter cutter = vtkCutter.New();
+            cutter.SetCutFunction(plane);
+            cutter.SetInputData(transformation.GetOutput());
+            cutter.Update();
+
+            vtkPolyDataMapper mapper = vtkPolyDataMapper.New();
+            mapper.SetInputData(cutter.GetOutput());
+
+            vtkActor crossSectionActor = vtkActor.New();
+            crossSectionActor.GetProperty().SetColor(1.0, 0.5, 0);
+            crossSectionActor.GetProperty().SetLineWidth(2);
+            crossSectionActor.SetMapper(mapper);
+
+            return crossSectionActor;
+        }
+
+        public static Vector3D CalculateNormalVector(Vector3D point1, Vector3D point2, Vector3D point3)
+        {
+            Vector3D retValue = Vector3D.CrossProduct((point3 - point2), (point1 - point2));
+            retValue.Normalize();
+            return retValue;
         }
     }
 }

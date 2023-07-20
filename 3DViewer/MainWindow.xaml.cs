@@ -40,5 +40,10 @@ namespace _3DViewer
         {
             _viewModel.SetMode(MainWindowViewModel.Modes.PointMeasure);
         }
+
+        private void CrossSection_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SetMode(MainWindowViewModel.Modes.CrossSection);
+        }
     }
 }
