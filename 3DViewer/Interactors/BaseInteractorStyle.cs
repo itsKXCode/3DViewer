@@ -10,19 +10,16 @@ namespace _3DViewer.Interactors
     /// <summary>
     /// The Base Interactor every other interactor should inherit from
     /// </summary>
-    public class BaseInteractor : vtkInteractorStyleTrackballCamera
+    public class BaseInteractorStyle : vtkInteractorStyleTrackballCamera
     {
-        public vtkObjectEventHandler BaseLeftButtonDownEventHandler = null;
-
-        public BaseInteractor() : base()
+        public BaseInteractorStyle() : base()
         {
             SetEventHandlers();
+            this.SetMotionFactor(30);
+            this.SetMouseWheelMotionFactor(0.5);
         }
 
-        //public void SetDefaultRenderer(vtkRenderer renderer)
-        //{
-        //    this.SetDefaultRenderer(renderer);
-        //}
+        public virtual void Clear() { }
 
         private void SetEventHandlers()
         {

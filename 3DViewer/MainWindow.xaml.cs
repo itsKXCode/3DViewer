@@ -35,5 +35,10 @@ namespace _3DViewer
             if (result == true)
                 _viewModel.ImportFile(dialog.FileName);
         }
+
+        private void Measure_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SetMode(MainWindowViewModel.Modes.PointMeasure);
+        }
     }
 }

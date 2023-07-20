@@ -16,16 +16,49 @@ namespace _3DViewer.ViewModels
 {
     public class MainWindowViewModel
     {
+        public enum Modes
+        {
+            Default,
+            PointMeasure
+        }
+
         private vtkRenderWindow _renderWindow;
         private vtkRenderer _mainRenderer { get => _renderWindow.GetRenderers().GetFirstRenderer(); }
         private vtkRenderer _secondRenderer = vtkRenderer.New();
         private vtkRenderer _thirdRenderer = vtkRenderer.New();
+
+        //We need to store the reference to the Interactor style, otherwise the GarbageCollector would collect internal events and VTK throws a Exception afterwards
+        private BaseInteractorStyle _interactorStyle;
+        private vtkRenderWindowInteractor _interactor = vtkRenderWindowInteractor.New();
+
 
         public MainWindowViewModel(vtkRenderWindow renderWindow)
         {
             _renderWindow = renderWindow;
 
             InitializeRenderWindow();
+        }
+
+        public void SetMode(Modes mode)
+        {
+            _interactorStyle?.Clear();
+
+            switch (mode)
+            {
+                case Modes.Default:
+                    _interactorStyle = new BaseInteractorStyle();
+                    break;
+                case Modes.PointMeasure:
+                    _interactorStyle = new PointMeasureInteractorStyle();
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            _interactor.SetInteractorStyle(_interactorStyle);
+            _renderWindow.SetInteractor(_interactor);
+
+            _interactorStyle.SetDefaultRenderer(_mainRenderer);
         }
 
         public void ImportFile(string filePath)
@@ -85,7 +118,7 @@ namespace _3DViewer.ViewModels
             SetupRenderer();
             SetupCamera();
             SetupLight();
-            SetupDefaultInteractor();
+            SetMode(Modes.Default);
 
             _renderWindow.Render();
         }
@@ -136,20 +169,5 @@ namespace _3DViewer.ViewModels
             _mainRenderer.AddLight(light);
             _secondRenderer.AddLight(light);
         }
-
-        private void SetupDefaultInteractor()
-        {
-            var trackball = new BaseInteractor();
-            trackball.SetMotionFactor(30);
-            trackball.SetMouseWheelMotionFactor(0.5);
-
-            var interactor = vtkRenderWindowInteractor.New();
-            interactor.SetInteractorStyle(trackball);
-            _renderWindow.SetInteractor(interactor);
-
-            trackball.SetDefaultRenderer(_mainRenderer);
-        }
-
-
     }
 }

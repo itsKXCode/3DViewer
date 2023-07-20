@@ -63,8 +63,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Interactors\BaseInteractor.cs" />
-    <Compile Include="Interactors\PointMeasureInteractor.cs" />
+    <Compile Include="Interactors\BaseInteractorStyle.cs" />
+    <Compile Include="Interactors\PointMeasureInteractorStyle.cs" />
     <Compile Include="Utilities\Interop.cs" />
     <Compile Include="Utilities\ModelImporter.cs" />
     <Compile Include="Utilities\VTKHelper.cs" />
