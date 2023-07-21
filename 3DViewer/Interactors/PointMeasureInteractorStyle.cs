@@ -73,7 +73,7 @@ namespace _3DViewer.Interactors
 
                     var center1 = new Vector3D(_sphere1.GetCenter()[0], _sphere1.GetCenter()[1], _sphere1.GetCenter()[2]);
                     var center2 = new Vector3D(_sphere2.GetCenter()[0], _sphere2.GetCenter()[1], _sphere2.GetCenter()[2]);
-                    
+
                     SetDistanceText((center2 - center1).Length);
 
                     _line = VTKHelper.Create3DLine(center1, center2);
@@ -129,7 +129,8 @@ namespace _3DViewer.Interactors
 
                         lineSource.SetPoint1(pos1.X, pos1.Y, pos1.Z);
                         lineSource.SetPoint2(pos2.X, pos2.Y, pos2.Z);
-                        
+
+
                         SetDistanceText((pos2 - pos1).Length);
 
                         base.GetInteractor().GetRenderWindow().Render();

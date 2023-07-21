@@ -10,13 +10,14 @@ using System.Windows.Media.Media3D;
 using System.Xml;
 using _3DViewer.Interactors;
 using _3DViewer.Utilities;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Kitware.VTK;
 
 namespace _3DViewer.ViewModels
 {
-    public class MainWindowViewModel
+    public partial class MainWindowViewModel : ObservableObject
     {
-        public enum Modes
+        public enum InteractionMode
         {
             Default,
             PointMeasure,
@@ -32,27 +33,32 @@ namespace _3DViewer.ViewModels
         private BaseInteractorStyle _interactorStyle;
         private vtkRenderWindowInteractor _interactor = vtkRenderWindowInteractor.New();
 
+        private bool _fileLoaded;
+        public bool FileLoaded
+        {
+            get { return _fileLoaded; }
+            set { SetProperty(ref _fileLoaded, value); }
+        }
 
-        public MainWindowViewModel(vtkRenderWindow renderWindow)
+        public void SetRenderWindow(vtkRenderWindow renderWindow)
         {
             _renderWindow = renderWindow;
-
             InitializeRenderWindow();
         }
 
-        public void SetMode(Modes mode)
+        public void SetInteractionMode(InteractionMode mode)
         {
             _interactorStyle?.Clear();
 
             switch (mode)
             {
-                case Modes.Default:
+                case InteractionMode.Default:
                     _interactorStyle = new BaseInteractorStyle();
                     break;
-                case Modes.PointMeasure:
+                case InteractionMode.PointMeasure:
                     _interactorStyle = new PointMeasureInteractorStyle();
                     break;
-                case Modes.CrossSection:
+                case InteractionMode.CrossSection:
                     _interactorStyle = new CrossSectionInteractorStyle();
                     break;
                 default:
@@ -67,6 +73,8 @@ namespace _3DViewer.ViewModels
 
         public void ImportFile(string filePath)
         {
+            _mainRenderer.RemoveAllViewProps();
+            FileLoaded = false;
             vtkPolyData polydata = null;
 
             try
@@ -103,8 +111,11 @@ namespace _3DViewer.ViewModels
             CenterActor(actor);
 
             _mainRenderer.AddActor(actor);
+            SetInteractionMode(InteractionMode.Default);
 
             _renderWindow.Render();
+
+            FileLoaded = true;
         }
 
         private void CenterActor(vtkActor actor)
@@ -122,7 +133,7 @@ namespace _3DViewer.ViewModels
             SetupRenderer();
             SetupCamera();
             SetupLight();
-            SetMode(Modes.Default);
+            SetInteractionMode(InteractionMode.Default);
 
             _renderWindow.Render();
         }

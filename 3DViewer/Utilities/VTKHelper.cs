@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -70,10 +71,11 @@ namespace _3DViewer.Utilities
             plane.SetOrigin(position.X, position.Y, position.Z);
             plane.SetNormal(direction.X, direction.Y, direction.Z);
 
-            //Apply the Current Transform to the Polydata
             vtkPolyData polyDataCopy = vtkPolyData.New();
-            vtkTransformPolyDataFilter transformation = vtkTransformPolyDataFilter.New();
             polyDataCopy.DeepCopy(actor.GetMapper().GetInput());
+
+            //Apply the Current Transform to the Polydata
+            vtkTransformPolyDataFilter transformation = vtkTransformPolyDataFilter.New();
             transformation.SetInputData(polyDataCopy);
             transformation.SetTransform(actor.GetUserTransform());
             transformation.Update();
@@ -82,7 +84,7 @@ namespace _3DViewer.Utilities
             cutter.SetCutFunction(plane);
             cutter.SetInputData(transformation.GetOutput());
             cutter.Update();
-
+            
             vtkPolyDataMapper mapper = vtkPolyDataMapper.New();
             mapper.SetInputData(cutter.GetOutput());
 
@@ -99,6 +101,13 @@ namespace _3DViewer.Utilities
             Vector3D retValue = Vector3D.CrossProduct((point3 - point2), (point1 - point2));
             retValue.Normalize();
             return retValue;
+        }
+
+        public static IntPtr CreateIntPtrFromArray(double[] obj)
+        {
+            System.IntPtr returnValue = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(float)) * obj.Length);
+            Marshal.Copy(obj, 0, returnValue, obj.Length);
+            return returnValue;
         }
     }
 }
