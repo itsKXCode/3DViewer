@@ -35,6 +35,11 @@ namespace _3DViewer.Utilities
                     plyReader.SetFileName(filePath);
                     plyReader.Update();
                     return plyReader.GetOutput();
+                case ".vtp":
+                    var vtpReader = vtkXMLPolyDataReader.New();
+                    vtpReader.SetFileName(filePath);
+                    vtpReader.Update();
+                    return vtpReader.GetOutput();
                 default:
                     throw new NotImplementedException($"Filetype {Path.GetExtension(filePath)} not Supported");
             }

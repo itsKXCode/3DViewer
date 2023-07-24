@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -25,7 +28,7 @@ namespace _3DViewer.ViewModels
         }
 
         private vtkRenderWindow _renderWindow;
-        private vtkRenderer _mainRenderer { get => _renderWindow.GetRenderers().GetFirstRenderer(); }
+        private vtkRenderer _mainRenderer;
         private vtkRenderer _secondRenderer = vtkRenderer.New();
         private vtkRenderer _thirdRenderer = vtkRenderer.New();
 
@@ -68,12 +71,14 @@ namespace _3DViewer.ViewModels
             _interactor.SetInteractorStyle(_interactorStyle);
             _renderWindow.SetInteractor(_interactor);
 
-            _interactorStyle.SetDefaultRenderer(_mainRenderer);
+            _interactorStyle.SetMainRenderer(_mainRenderer);
+            _interactorStyle.SetSecondRenderer(_secondRenderer);
         }
 
         public void ImportFile(string filePath)
         {
-            _mainRenderer.RemoveAllViewProps();
+            InitializeRenderWindow();
+
             FileLoaded = false;
             vtkPolyData polydata = null;
 
@@ -87,6 +92,35 @@ namespace _3DViewer.ViewModels
                 return;
             }
 
+            if (HasScalar(polydata,"Dicke"))
+                polydata.GetCellData().SetActiveScalars("Dicke");
+
+            _mainRenderer.AddActor(CreateActorFromPolyData(polydata));
+            SetInteractionMode(InteractionMode.Default);
+
+            SetupScalarRenderer(polydata);
+
+            _renderWindow.Render();
+
+            FileLoaded = true;
+        }
+
+        private bool HasScalar(vtkPolyData polyData, string Name)
+        {
+            try
+            {
+                var nums = polyData.GetCellData().GetScalars(Name).GetNumberOfComponents();
+
+                return nums > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private vtkActor CreateActorFromPolyData(vtkPolyData polydata)
+        {
             //Convert Polydata to Triangles
             vtkTriangleFilter triangle = vtkTriangleFilter.New();
             triangle.SetInputData(polydata);
@@ -110,12 +144,42 @@ namespace _3DViewer.ViewModels
 
             CenterActor(actor);
 
-            _mainRenderer.AddActor(actor);
-            SetInteractionMode(InteractionMode.Default);
+            return actor;
+        }
 
-            _renderWindow.Render();
+        /// <summary>
+        /// Enables the Scalars if the PolyData has it (should only happen if it is a intern generated .vtp file)
+        /// </summary>
+        /// <param name="polyData"></param>
+        private void SetupScalarRenderer(vtkPolyData polyData)
+        {
+            if (HasScalar(polyData, "Selbstueberschneidung") &&
+                HasScalar(polyData, "svMax"))
+            {
+                _secondRenderer.SetViewport(0, 0, 0.8, 1);
+                _mainRenderer.SetViewport(0, 0, 0.8, 1);
+                var renderer1 = vtkRenderer.New();
+                var renderer2 = vtkRenderer.New();
+                renderer1.SetViewport(0.8, 0.5, 1, 1);
+                renderer2.SetViewport(0.8, 0.0, 1, 0.5);
 
-            FileLoaded = true;
+                _renderWindow.AddRenderer(renderer1);
+                _renderWindow.AddRenderer(renderer2);
+                renderer1.SetActiveCamera(_mainRenderer.GetActiveCamera());
+                renderer2.SetActiveCamera(_mainRenderer.GetActiveCamera());
+
+                vtkPolyData polyDataCuts = vtkPolyData.New();
+                polyDataCuts.DeepCopy(polyData);
+                polyDataCuts.GetCellData().SetActiveScalars("Selbstueberschneidung");
+
+                vtkPolyData polyDataSvMax = vtkPolyData.New();
+                polyDataSvMax.DeepCopy(polyData);
+                polyDataSvMax.GetCellData().SetActiveScalars("svMax");
+
+                renderer1.AddActor(CreateActorFromPolyData(polyDataCuts));
+
+                renderer2.AddActor(CreateActorFromPolyData(polyDataSvMax));
+            }
         }
 
         private void CenterActor(vtkActor actor)
@@ -140,20 +204,35 @@ namespace _3DViewer.ViewModels
 
         private void SetupRenderer()
         {
+            RemoveAllRenderers();
+
+            _mainRenderer = vtkRenderer.New();
+            _secondRenderer = vtkRenderer.New();
+            _thirdRenderer = vtkRenderer.New();
+
             _renderWindow.SetMultiSamples(0);
             _mainRenderer.SetBackground(0.2, 0.2, 0.2);
 
             //Initialize the Second and third renderer
             _renderWindow.SetNumberOfLayers(2);
 
-            _secondRenderer = vtkRenderer.New();
-            _thirdRenderer = vtkRenderer.New();
+            _secondRenderer.SetBackground(0.2, 0.2, 0.2);
 
             _secondRenderer.SetLayer(1);
             _thirdRenderer.SetLayer(1);
             _mainRenderer.SetLayer(0);
 
             _renderWindow.AddRenderer(_secondRenderer);
+            _renderWindow.AddRenderer(_mainRenderer);
+        }
+
+        private void RemoveAllRenderers()
+        {
+            var renderCollection = _renderWindow.GetRenderers();
+            renderCollection.InitTraversal();
+
+            for (int i = 0; i < renderCollection.GetNumberOfItems(); i++)
+                _renderWindow.RemoveRenderer(renderCollection.GetNextItem());
         }
 
         private void SetupCamera()

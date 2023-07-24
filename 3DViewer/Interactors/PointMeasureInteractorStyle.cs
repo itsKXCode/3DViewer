@@ -33,6 +33,8 @@ namespace _3DViewer.Interactors
         public override void Clear()
         {
             GetSecondRenderer().RemoveAllViewProps();
+            if (_distanceTextWidget != null)
+                _distanceTextWidget.Off();
             GetMainRenderWindow().Render();
             base.Clear();
         }

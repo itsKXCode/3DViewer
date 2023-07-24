@@ -12,22 +12,33 @@ namespace _3DViewer.Interactors
     /// </summary>
     public class BaseInteractorStyle : vtkInteractorStyleTrackballCamera
     {
+        private vtkRenderer _mainRenderer;
+        private vtkRenderer _secondRenderer;
+
         public BaseInteractorStyle() : base()
         {
             SetEventHandlers();
             this.SetMotionFactor(30);
             this.SetMouseWheelMotionFactor(0.5);
         }
+
+        public void SetSecondRenderer(vtkRenderer renderer)
+        {
+            _secondRenderer = renderer;
+        }
+        public void SetMainRenderer(vtkRenderer renderer)
+        {
+            _mainRenderer = renderer;
+        }
+
         protected vtkRenderer GetMainRenderer()
         {
-            return base.GetInteractor().GetRenderWindow().GetRenderers().GetFirstRenderer();
+            return _mainRenderer;
         }
 
         protected vtkRenderer GetSecondRenderer()
         {
-            base.GetInteractor().GetRenderWindow().GetRenderers().InitTraversal();
-            base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
-            return base.GetInteractor().GetRenderWindow().GetRenderers().GetNextItem();
+            return _secondRenderer;
         }
 
         protected vtkRenderWindow GetMainRenderWindow()

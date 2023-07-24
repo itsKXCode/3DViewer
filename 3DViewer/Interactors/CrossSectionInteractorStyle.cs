@@ -32,6 +32,7 @@ namespace _3DViewer.Interactors
         public override void Clear()
         {
             GetSecondRenderer().RemoveAllViewProps();
+
             SetMainActorsOpacity(1);
             GetMainRenderWindow().Render();
             base.Clear();

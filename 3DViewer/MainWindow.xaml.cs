@@ -31,7 +31,7 @@ namespace _3DViewer
         {
             //Open File Dialog
             var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.Filter = "stl, obj, ply (*.stl, *.obj, *.ply)| *.stl; *.obj; *.ply"; 
+            dialog.Filter = "stl, obj, ply, vtp (*.stl, *.obj, *.ply, *.vtp)| *.stl; *.obj; *.ply; *.vtp"; 
 
             var result = dialog.ShowDialog();
 
