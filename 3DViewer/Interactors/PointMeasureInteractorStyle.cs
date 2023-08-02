@@ -23,7 +23,7 @@ namespace _3DViewer.Interactors
 
         private vtkActor _sphereToMove = null;
 
-        private Color _sphereColor = new Color() { R = 255, G = 150, B = 0 };
+        private Color _sphereColor = new Color() { R = 255, G = 0, B = 0 };
 
         public PointMeasureInteractorStyle() : base()
         {
